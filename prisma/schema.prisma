@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "./generated-prisma-client"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model ZkSyncTransaction {
+  id          String @id @map("_id")
+  mainAddress String @map("main_address")
+  from        String @map("from")
+  to          String @map("to")
+  value       String @map("value")
+  paymentType String @map("payment_type")
+  receivedAt  String @map("received_at")
+  status      String @map("status")
+  blockNumber BigInt @map("block_number")
+  blockHash   String @map("block_hash")
+  nonce       Int    @map("nonce")
+
+  processStatus String  @map("process_status")
+  processAt     Int     @map("process_at")
+  linkedTxHash  String? @map("linked_tx_hash")
+
+  @@map("zksync_transaction")
+}
+
+model EthereumTransaction {
+  id          String @id @map("_id")
+  mainAddress String @map("main_address")
+  from        String @map("from")
+  to          String @map("to")
+  value       String @map("value")
+  paymentType String @map("payment_type")
+  receivedAt  String @map("received_at")
+  blockNumber BigInt @map("block_number")
+  blockHash   String @map("block_hash")
+  nonce       String @map("nonce")
+
+  processStatus String  @map("process_status")
+  processAt     Int     @map("process_at")
+  linkedTxHash  String? @map("linked_tx_hash")
+
+  @@map("ethereum_transaction")
+}
+
+model EthereumERC20Transaction {
+  id              String @id @map("_id")
+  mainAddress     String @map("main_address")
+  from            String @map("from")
+  to              String @map("to")
+  value           String @map("value")
+  paymentType     String @map("payment_type")
+  receivedAt      String @map("received_at")
+  blockNumber     BigInt @map("block_number")
+  blockHash       String @map("block_hash")
+  nonce           String @map("nonce")
+  contractAddress String @map("contract_address")
+  tokenSymbol     String @map("token_symbol")
+
+  processStatus String  @map("process_status")
+  processAt     Int     @map("process_at")
+  linkedTxHash  String? @map("linked_tx_hash")
+
+  @@map("ethereum_erc20_transaction")
+}
+
+model BotUpdateLog {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  createAt Int    @map("create_at")
+  botId    String @map("bot_id")
+  chatType String @map("chat_type") // group - 群聊, private - 私聊
+  fromId   String @map("from_id")
+  fromName String @map("from_name")
+  updateId Int    @map("update_id")
+  update   Json   @map("update")
+}
