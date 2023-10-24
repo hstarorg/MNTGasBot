@@ -1,0 +1,49 @@
+name: Deploy to EC2
+
+on:
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-2                   # set this to your preferred AWS region, e.g. us-west-1
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: development
+    strategy:
+      matrix:
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup pnpm
+      # You may pin to the exact commit or the version.
+      # uses: pnpm/action-setup@c3b53f6a16e57305370b4ae5a540c2077a1d50dd
+      uses: pnpm/action-setup@v2.2.4
+      with:
+        # Version of pnpm to install
+        version: latest # optional
+        # Where to store pnpm files
+        # dest: # optional, default is ~/setup-pnpm
+        # If specified, run `pnpm install`
+        run_install: true # optional, default is null
+        
+    - run: pnpm build
+    
+    - name: Upload Files to EC2
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ vars.DEPLOY_EC2_INSTANCE }}
+        username: ec2-user
+        key: ${{ secrets.SFTP_SSH_KEY }}
+        port: 22
+        source: "./dist,./prisma,package.json,pnpm-lock.yaml"
+        target: "/home/ec2-user/w3b-sentinel"
